@@ -21,9 +21,8 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
 
     const formData = new FormData();
     formData.append("image", selectedImage);
-
     axios
-      .post("/api/process-image", formData)
+      .post("http://127.0.0.1:5000/api/process-image", formData)
       .then((response) => {
         onImageUpload(response.data.result);
       })

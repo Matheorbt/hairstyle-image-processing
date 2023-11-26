@@ -30,7 +30,7 @@ def dlib_shp_to_bb(rect, shape, res):
 			max_x = x
 		if max_y < y:
 			max_y = y
-	
+
 	left_top = (min(rect.left(), min_x), min(rect.top(), min_y))
 	right_bottom = (max(rect.right(), max_x), max(rect.bottom(), max_y))
 	print( left_top, right_bottom )
@@ -44,18 +44,18 @@ while True:
 	img = cap.read()[1]
 	img_ = cv.cvtColor(img, cv.COLOR_BGR2RGB)
 	cap.release()
-	
+
 	rects = detector(img, 0)
 
 	for (i,rect) in enumerate(rects):
 		shape = predictor(img_, rect)
 		coords = dlib_shp_to_np(shape)
-		
+
 		left_top, right_bottom = dlib_shp_to_bb(rect, shape, (img.shape[1], img.shape[0]))
 		cv.rectangle(img, left_top, right_bottom, (0,255,0), 1)
-		
+
 		for (x, y) in coords:
 			cv.circle(img, (x, y), 2, (0, 255, 0), -1)
-	
+
 	plt.imshow(cv.cvtColor(img, cv.COLOR_BGR2RGB))
 	plt.show()
