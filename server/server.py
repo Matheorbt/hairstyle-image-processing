@@ -10,6 +10,7 @@ matplotlib.use('Agg')
 app = Flask(__name__)
 CORS(app, origins=['http://localhost:3000/', 'https://melius-capillus.vercel.app/'])
 from flask import send_file
+import os
 
 detector = dlib.get_frontal_face_detector()  # HOG + LinearSVM
 predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks_GTX.dat')
@@ -57,4 +58,4 @@ def get_result_image():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    app.run(host="0.0.0.0", port=os.environ.get('PORT', 5001), debug=True)
