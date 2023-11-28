@@ -3,4 +3,4 @@ Flask-Cors==3.0.10
 numpy==1.21.2
 dlib==19.22.1
 matplotlib==3.4.3
-opencv-python==4.5.3
+opencv-python==4.5.3.56
