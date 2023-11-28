@@ -11,8 +11,11 @@ const App: React.FC = () => {
   };
 
   return (
-    <div>
-      <h1>Face Detection Web App</h1>
+    <div className="min-h-screen bg-gradient-to-b from-[#ebf4f5] to-[#b5c6e0] flex flex-col justify-center items-center p-8">
+      <h1
+        className="text-5xl font-bold text-center mb-10"
+        style={{ fontFamily: "Dancing Script" }}
+      >Melius Capillus</h1>
       <ImageUploader onImageUpload={handleImageUpload} />
       {processedImage && <ResultImage />}
     </div>
