@@ -4,7 +4,7 @@ const ResultImage = () => {
   const [imageSrc, setImageSrc] = useState(null);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/api/get-result-image")
+    fetch("http://127.0.0.1:5001/api/get-result-image")
       .then((response) => response.blob())
       .then((blob) => {
         const url = URL.createObjectURL(blob);

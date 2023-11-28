@@ -1,6 +1,7 @@
-Flask==2.2.5
-Flask-Cors==3.0.10
-numpy==1.21.2
-dlib==19.22.1
-matplotlib==3.4.3
-opencv-python==4.5.3.56
+dlib==19.24.2
+Flask==3.0.0
+Flask_Cors==4.0.0
+matplotlib==3.7.4
+numpy==1.24.4
+opencv_python==4.8.1.78
+pypng===0.20220715.0
