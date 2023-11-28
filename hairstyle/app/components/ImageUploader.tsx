@@ -44,7 +44,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
     const formData = new FormData();
     formData.append("image", selectedImage);
     axios
-      .post("http://127.0.0.1:5001/api/process-image", formData)
+      .post("https://melius-capillus-9f332e274492.herokuapp.com/api/process-image", formData)
       .then((response) => {
         onImageUpload(response.data.result);
       })

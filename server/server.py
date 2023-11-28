@@ -8,7 +8,7 @@ import cv2 as cv
 import matplotlib
 matplotlib.use('Agg')
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=['http://localhost:3000/', 'https://melius-capillus.vercel.app/'])
 from flask import send_file
 
 detector = dlib.get_frontal_face_detector()  # HOG + LinearSVM
