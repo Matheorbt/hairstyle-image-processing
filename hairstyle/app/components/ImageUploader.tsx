@@ -13,7 +13,8 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [mode, setMode] = useState<"upload" | "webcam" | "video">("upload");
 
-  const webcamRef = useRef<typeof Webcam>(null);
+  const webcamRef = useRef<Webcam | null>(null);
+
   const capture = React.useCallback(async () => {
     if (!webcamRef.current) return;
     const imageSrc = (webcamRef.current as any).getScreenshot();
@@ -145,10 +146,9 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
             </div>
             <Webcam
               audio={false}
-              height={720}
               ref={webcamRef}
               screenshotFormat="image/jpeg"
-              width={1280}
+              width={720}
               videoConstraints={videoConstraints}
               className="z-10"
             />
@@ -158,17 +158,30 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
             >
               Capture photo
             </button>
-            <Image
-              src={
-                selectedImage ? URL.createObjectURL(selectedImage) : Placeholder
-              }
-              alt="Placeholder"
-              className="object-contain"
-              width={420}
-              height={420}
-            />
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Webcam is not working? Try using the upload option instead.
+            </p>
+            <hr className="w-full bg-gray-700" />
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Preview:
+              </p>
+              <Image
+                src={
+                  selectedImage
+                    ? URL.createObjectURL(selectedImage)
+                    : Placeholder
+                }
+                alt="Placeholder"
+                className="object-contain"
+                width={420}
+                height={420}
+              />
+            </div>
           </div>
         )}
+        <hr className="w-full bg-gray-700 my-8" />
+
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           onClick={handleUpload}
