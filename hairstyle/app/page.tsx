@@ -5,13 +5,26 @@ import ResultImage from "./components/ResultImage";
 import Head from "next/head";
 import Image from "next/image";
 import QrCode from "@/asset/qr_code.svg"
+import HaircutChoises from "./components/HaircutChoises";
 
 const App: React.FC = () => {
   const [processedImage, setProcessedImage] = useState<string | null>(null);
+  const [faceOriginalImage, setFaceOriginalImage] = useState<File | null>(null);
+  const [faceType, setFaceType] = useState<string>("");
+
+  const handleFaceTypeChange = (type: string) => {
+    setFaceType(type);
+  }
 
   const handleImageUpload = (result: string) => {
     setProcessedImage(result);
   };
+
+  const handleFaceOriginalImageUpload = (result: File) => {
+    setFaceOriginalImage(result);
+  }
+
+  console.log("faceOriginalImage", faceOriginalImage);
 
   return (
     <>
@@ -43,8 +56,9 @@ const App: React.FC = () => {
         >
           Melius Capillus
         </h1>
-        <ImageUploader onImageUpload={handleImageUpload} />
+        <ImageUploader onImageUpload={handleImageUpload} handleFaceTypeChange={handleFaceTypeChange} handleFaceOriginalImageUpload={handleFaceOriginalImageUpload} />
         {processedImage && <ResultImage />}
+        {faceOriginalImage && faceType && <HaircutChoises faceType={faceType} processedImage={processedImage} faceOriginalImage={faceOriginalImage} />}
       </div>
     </>
   );

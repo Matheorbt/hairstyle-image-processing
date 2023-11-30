@@ -7,9 +7,11 @@ import { MoonLoader } from "react-spinners";
 
 interface ImageUploaderProps {
   onImageUpload: (result: string) => void;
+  handleFaceTypeChange: (type: string) => void;
+  handleFaceOriginalImageUpload: (result: File) => void;
 }
 
-const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
+const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, handleFaceTypeChange, handleFaceOriginalImageUpload }) => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [mode, setMode] = useState<"upload" | "webcam" | "video">("upload");
 
@@ -21,6 +23,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
     const blob = await fetch(imageSrc).then((res) => res.blob());
     const filename = "webcam.jpg";
     setSelectedImage(new File([blob], filename));
+    handleFaceOriginalImageUpload(new File([blob], filename));
   }, [webcamRef]);
 
   const videoConstraints = {
@@ -32,6 +35,8 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     setSelectedImage(file || null);
+    if (!file) return;
+    handleFaceOriginalImageUpload(file);
   };
 
   const handleUpload = () => {
@@ -47,6 +52,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
       .post("http://127.0.0.1:5001/api/process-image", formData)
       .then((response) => {
         onImageUpload(response.data.result);
+        handleFaceTypeChange(response.data.faceType);
       })
       .catch((error) => {
         console.error("Error uploading image:", error);
