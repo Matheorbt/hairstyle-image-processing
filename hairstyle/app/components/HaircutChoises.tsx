@@ -129,7 +129,6 @@ const HaircutChoises = ({ faceType, processedImage, faceOriginalImage }: Haircut
             responseType: 'blob'
         })
         .then((response) => {
-            // Votre traitement actuel devrait être correct
             const blob = new Blob([response.data], { type: "image/png" });
             const filename = "result.png";
             setResultImage(URL.createObjectURL(blob));

@@ -49,7 +49,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, handleFace
     const formData = new FormData();
     formData.append("image", selectedImage);
     axios
-      .post("https://melius-capillus-9f332e274492.herokuapp.com/api/process-image", formData)
+      .post("http://localhost:5001/api/process-image", formData)
       .then((response) => {
         onImageUpload(response.data.result);
         handleFaceTypeChange(response.data.faceType);

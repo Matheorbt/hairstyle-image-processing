@@ -17,6 +17,7 @@ const App: React.FC = () => {
   }
 
   const handleImageUpload = (result: string) => {
+    console.log("result", result);
     setProcessedImage(result);
   };
 

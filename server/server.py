@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use('Agg')
 import base64
 import io
 import numpy as np
@@ -7,11 +9,10 @@ import dlib
 import matplotlib.pyplot as plt
 from flask import Flask, request, jsonify, url_for
 import cv2 as cv
-import matplotlib
-matplotlib.use('Agg')
 app = Flask(__name__)
-CORS(app, origins=['http://localhost:3000/', 'https://melius-capillus.vercel.app/'])
+CORS(app, origins=['http://localhost:3000/', 'https://melius-capillus.vercel.app/', 'http://localhost:3000', 'http://localhost:5001/'])
 from flask import send_file
+from proj02 import *
 import os
 
 detector = dlib.get_frontal_face_detector()  # HOG + LinearSVM
@@ -24,18 +25,18 @@ def classify_face_type(img):
     # 2 = oval
     # 3 = round
     # 4 = square
-    fakeFaceType = 0
+    faceType = predict_faceshape(img)
     
     # send text face type
-    if fakeFaceType == 0:
+    if faceType == 0:
         return 'heart'
-    elif fakeFaceType == 1:
+    elif faceType == 1:
         return 'oblong'
-    elif fakeFaceType == 2:
+    elif faceType == 2:
         return 'oval'
-    elif fakeFaceType == 3:
+    elif faceType == 3:
         return 'round'
-    elif fakeFaceType == 4:
+    elif faceType == 4:
         return 'square'
     else:
         return 'unknown'
@@ -57,6 +58,7 @@ def process_image(img, show_points=True):
     plt.imshow(cv.cvtColor(img, cv.COLOR_BGR2RGB))
     plt.axis('off')  # Hide the axis
     plt.savefig('result.png', bbox_inches='tight', pad_inches=0)
+    plt.close(fig='all')
     return 'result.png', classify_face_type(img), coords
 
 @app.route('/api/process-image', methods=['POST'])
