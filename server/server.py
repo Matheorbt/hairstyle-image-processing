@@ -1,4 +1,5 @@
 import matplotlib
+
 matplotlib.use('Agg')
 import base64
 import io
@@ -12,7 +13,7 @@ import cv2 as cv
 app = Flask(__name__)
 CORS(app, origins=['http://localhost:3000/', 'https://melius-capillus.vercel.app/', 'http://localhost:3000', 'http://localhost:5001/'])
 from flask import send_file
-from proj02 import *
+from proj02 import bgr_to_rgb, predict_faceshape
 import os
 
 detector = dlib.get_frontal_face_detector()  # HOG + LinearSVM
@@ -42,7 +43,7 @@ def classify_face_type(img):
         return 'unknown'
 
 def process_image(img, show_points=True):
-    img_ = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+    img_ = bgr_to_rgb(img)
     rects = detector(img_, 1)
 
     for (i, rect) in enumerate(rects):
@@ -55,7 +56,7 @@ def process_image(img, show_points=True):
             for (x, y) in coords:
                 cv.circle(img, (x, y), 2, (0, 255, 0), -1)
 
-    plt.imshow(cv.cvtColor(img, cv.COLOR_BGR2RGB))
+    plt.imshow(bgr_to_rgb(img))
     plt.axis('off')  # Hide the axis
     plt.savefig('result.png', bbox_inches='tight', pad_inches=0)
     plt.close(fig='all')
