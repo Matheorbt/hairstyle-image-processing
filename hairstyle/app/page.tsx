@@ -6,6 +6,7 @@ import Head from "next/head";
 import Image from "next/image";
 import QrCode from "@/asset/qr_code.svg"
 import HaircutChoises from "./components/HaircutChoises";
+import { Toaster } from 'react-hot-toast';
 
 const App: React.FC = () => {
   const [processedImage, setProcessedImage] = useState<string | null>(null);
@@ -49,6 +50,7 @@ const App: React.FC = () => {
         />
         <link rel="manifest" href="/site.webmanifest" />
       </Head>
+      <div><Toaster/></div>
       <div className="min-h-screen bg-gradient-to-b from-[#ebf4f5] to-[#b5c6e0] flex flex-col justify-center items-center p-8">
         <Image alt="qrcode" src={QrCode} width={250} height={250} className="my-8" />
         <h1

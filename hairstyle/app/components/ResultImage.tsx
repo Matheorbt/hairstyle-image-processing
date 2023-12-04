@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 const ResultImage = () => {
   const [imageSrc, setImageSrc] = useState(null);
@@ -11,6 +12,7 @@ const ResultImage = () => {
         setImageSrc(url as any);
       })
       .catch((error) => {
+        toast.error("Error fetching result image");
         console.error("Error fetching result image:", error);
       });
   }, []);

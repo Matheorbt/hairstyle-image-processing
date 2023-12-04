@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Image, { StaticImageData } from "next/image";
+import { Dna } from "react-loader-spinner";
 
 import oval_fringe_up from "@/asset/haircuts/oval/fringe_up.png";
 import oval_pushed_back_long from "@/asset/haircuts/oval/pushed_back_long.png";
@@ -36,144 +37,187 @@ import diamond_quiff from "@/asset/haircuts/diamond/quiff.png";
 import diamond_side_fringe from "@/asset/haircuts/diamond/side_fringe.png";
 
 import axios from "axios";
+import toast from "react-hot-toast";
 
 interface HaircutsImages {
-    [key: string]: {
-        [key: string]: StaticImageData;
-    };
+  [key: string]: {
+    [key: string]: StaticImageData;
+  };
 }
 
 const HaircutsImages: HaircutsImages = {
-    "oval": {
-        "fringe_up": oval_fringe_up,
-        "pushed_back_long": oval_pushed_back_long,
-        "side_parted_short": oval_side_parted_short,
-        "undercut": oval_undercut,
-    },
-    "round": {
-        "faux_hawk_with_sorted_sides": round_faux_hawk_with_sorted_sides,
-        "fringe_up": round_fringe_up,
-        "quiff": round_quiff,
-        "undercut": round_undercut,
-    },
-    "square": {
-        "crew_aka_buzz_cut": square_crew_aka_buzz_cut,
-        "faux_hawk": square_faux_hawk,
-        "slicked_back_side_part": square_slicked_back_side_part,
-        "undercut": square_undercut,
-    },
-    "triangular": {
-        "fringe_up": triangular_fringe_up,
-        "side_fringe": triangular_side_fringe,
-        "side_parted": triangular_side_parted,
-    },
-    "oblong": {
-        "buzz_cut": oblong_buzz_cut,
-        "fringe_up": oblong_fringe_up,
-        "side_fringe": oblong_side_fringe,
-        "side_parted": oblong_side_parted,
-    },
-    "heart": {
-        "long_fringes": heart_long_fringes,
-        "pushed_back": heart_pushed_back,
-        "side_parted_long": heart_side_parted_long,
-        "undercut": heart_undercut,
-    },
-    "diamond": {
-        "faux_hawk": diamond_faux_hawk,
-        "long_hair_pulled_back": diamond_long_hair_pulled_back,
-        "quiff": diamond_quiff,
-        "side_fringe": diamond_side_fringe,
-    },
-}
-
+  oval: {
+    fringe_up: oval_fringe_up,
+    pushed_back_long: oval_pushed_back_long,
+    side_parted_short: oval_side_parted_short,
+    undercut: oval_undercut,
+  },
+  round: {
+    faux_hawk_with_sorted_sides: round_faux_hawk_with_sorted_sides,
+    fringe_up: round_fringe_up,
+    quiff: round_quiff,
+    undercut: round_undercut,
+  },
+  square: {
+    crew_aka_buzz_cut: square_crew_aka_buzz_cut,
+    faux_hawk: square_faux_hawk,
+    slicked_back_side_part: square_slicked_back_side_part,
+    undercut: square_undercut,
+  },
+  triangular: {
+    fringe_up: triangular_fringe_up,
+    side_fringe: triangular_side_fringe,
+    side_parted: triangular_side_parted,
+  },
+  oblong: {
+    buzz_cut: oblong_buzz_cut,
+    fringe_up: oblong_fringe_up,
+    side_fringe: oblong_side_fringe,
+    side_parted: oblong_side_parted,
+  },
+  heart: {
+    long_fringes: heart_long_fringes,
+    pushed_back: heart_pushed_back,
+    side_parted_long: heart_side_parted_long,
+    undercut: heart_undercut,
+  },
+  diamond: {
+    faux_hawk: diamond_faux_hawk,
+    long_hair_pulled_back: diamond_long_hair_pulled_back,
+    quiff: diamond_quiff,
+    side_fringe: diamond_side_fringe,
+  },
+};
 
 interface HaircutChoicesProps {
-    faceType: string;
-    processedImage: string | null;
-    faceOriginalImage: File | null;
+  faceType: string;
+  processedImage: string | null;
+  faceOriginalImage: File | null;
 }
 
+const HaircutChoises = ({
+  faceType,
+  processedImage,
+  faceOriginalImage,
+}: HaircutChoicesProps) => {
+  const [haircutChoices, setHaircutChoices] = useState<string[]>([]);
+  const [resultImage, setResultImage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-const HaircutChoises = ({ faceType, processedImage, faceOriginalImage }: HaircutChoicesProps) => {
-    const [haircutChoices, setHaircutChoices] = useState<string[]>([]);
-    const [resultImage, setResultImage] = useState<string | null>(null);
-    
-    useEffect(() => {
-        // Vérifiez si le type de visage est valide
-        if (faceType in HaircutsImages) {
-            setHaircutChoices(Object.keys(HaircutsImages[faceType]));
-        } else {
-            // Gérer un type de visage inconnu ou invalide
-            console.error("Type de visage non reconnu:", faceType);
-            setHaircutChoices([]); // Ou définissez une valeur par défaut
-        }
-    }, [faceType]);
-
-
-    const handleTryOnPress = async (haircutFile: StaticImageData) => {
-
-        const formData = new FormData();
-        const haircutImageFile = new File([await fetch(haircutFile.src).then((res) => res.blob())], "haircut.jpg");
-
-        formData.append("haircut_image", haircutImageFile);
-        console.log(faceOriginalImage);
-        if (!faceOriginalImage) {
-            console.error("No image selected");
-            return;
-        }
-
-        formData.append("face_image", faceOriginalImage);
-
-        axios.post("http://127.0.0.1:5001/api/upload-haircut", formData, {
-            responseType: 'blob'
-        })
-        .then((response) => {
-            const blob = new Blob([response.data], { type: "image/png" });
-            const filename = "result.png";
-            setResultImage(URL.createObjectURL(blob));
-        })
-        .catch((error) => {
-            console.error("Error uploading image:", error);
-        });
+  useEffect(() => {
+    // Vérifiez si le type de visage est valide
+    if (faceType in HaircutsImages) {
+      setHaircutChoices(Object.keys(HaircutsImages[faceType]));
+    } else {
+      // Gérer un type de visage inconnu ou invalide
+      console.error("Unknown face type:", faceType);
+      toast.error("Unknown face type");
+      setHaircutChoices([]); // Ou définissez une valeur par défaut
     }
-        
-    return (
-        <div className="flex flex-col items-center">
-            <h1 className="text-2xl font-bold text-center mb-10 mt-10">Haircut Choices based on your face type: {faceType}</h1>
-            <div className="flex flex-wrap justify-center">
-                {haircutChoices.map((haircut) => {
-                    console.log(HaircutsImages[faceType][haircut]);
-                    return (
-                        <div key={haircut} className="flex flex-col items-center m-5" onClick={() => handleTryOnPress(HaircutsImages[faceType][haircut])}>
-                            <Image
-                                src={HaircutsImages[faceType][haircut]}
-                                alt={haircut.replace(/_/g, " ")}
-                                width={160}
-                                height={160}
-                                className="rounded-full"
-                            />
-                            <p className="text-center text-lg font-bold">
-                                {haircut.replace(/_/g, " ")}
-                            </p>
-                        </div>
-                    );
-                }
-                )}
-            </div>
+  }, [faceType]);
 
-            <h1 className="text-2xl font-bold text-center mb-10 mt-10">Try-on result</h1>
-            {resultImage && (
-                <Image
-                    src={resultImage}
-                    alt="Result"
-                    width={500}
-                    height={500}
-                    className="rounded-full"
-                />
-            )}
-        </div>
+  const handleTryOnPress = async (haircutFile: StaticImageData) => {
+    setIsLoading(true);
+    const formData = new FormData();
+    const haircutImageFile = new File(
+      [await fetch(haircutFile.src).then((res) => res.blob())],
+      "haircut.jpg"
     );
+
+    formData.append("haircut_image", haircutImageFile);
+    console.log(faceOriginalImage);
+    if (!faceOriginalImage) {
+      setIsLoading(false);
+      toast.error("No image selected");
+      console.error("No image selected");
+      return;
+    }
+
+    formData.append("face_image", faceOriginalImage);
+
+    axios
+      .post("http://127.0.0.1:5001/api/upload-haircut", formData, {
+        responseType: "blob",
+      })
+      .then((response) => {
+        const blob = new Blob([response.data], { type: "image/png" });
+        const filename = "result.png";
+        setResultImage(URL.createObjectURL(blob));
+        toast.success("Enjoy your new haircut!");
+      })
+      .catch((error) => {
+        console.error("Error uploading image:", error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  return (
+    <div className="flex flex-col items-center">
+      <h1 className="text-2xl font-bold text-center mb-10 mt-10">
+        Haircut Choices based on your face type: {faceType}
+      </h1>
+      <h2 className="text-xl font-bold text-center mb-10 mt-10">
+        Please click on a haircut to try-on
+      </h2>
+      <div className="flex flex-wrap justify-center">
+        {haircutChoices.map((haircut) => {
+          console.log(HaircutsImages[faceType][haircut]);
+          return (
+            <div
+              key={haircut}
+              className="flex flex-col items-center m-5"
+              onClick={() =>
+                handleTryOnPress(HaircutsImages[faceType][haircut])
+              }
+            >
+              <Image
+                src={HaircutsImages[faceType][haircut]}
+                alt={haircut.replace(/_/g, " ")}
+                width={160}
+                height={160}
+                className="rounded-full"
+              />
+              <p className="text-center text-lg font-bold">
+                {haircut.replace(/_/g, " ")}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+
+      <h1 className="text-2xl font-bold text-center mb-10 mt-10">
+        Try-on result
+      </h1>
+      {resultImage ? (
+        isLoading ? (
+          <div
+            className="
+            h-[250px]
+            flex
+            justify-center
+            items-center
+          "
+          >
+            <Dna />
+          </div>
+        ) : (
+          <Image
+            src={resultImage}
+            alt="Result"
+            width={500}
+            height={500}
+            className="rounded-full"
+          />
+        )
+      ) : (
+        <p className="text-center text-lg font-bold">
+          Please click on a haircut to try-on
+        </p>
+      )}
+    </div>
+  );
 };
 
 export default HaircutChoises;

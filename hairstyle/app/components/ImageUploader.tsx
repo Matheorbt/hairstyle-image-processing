@@ -4,6 +4,8 @@ import Image from "next/image";
 import Placeholder from "@/asset/placeholder.png";
 import Webcam from "react-webcam";
 import { MoonLoader } from "react-spinners";
+import toast from "react-hot-toast";
+import { Dna } from "react-loader-spinner";
 
 interface ImageUploaderProps {
   onImageUpload: (result: string) => void;
@@ -11,9 +13,14 @@ interface ImageUploaderProps {
   handleFaceOriginalImageUpload: (result: File) => void;
 }
 
-const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, handleFaceTypeChange, handleFaceOriginalImageUpload }) => {
+const ImageUploader: React.FC<ImageUploaderProps> = ({
+  onImageUpload,
+  handleFaceTypeChange,
+  handleFaceOriginalImageUpload,
+}) => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [mode, setMode] = useState<"upload" | "webcam" | "video">("upload");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const webcamRef = useRef<Webcam | null>(null);
 
@@ -40,9 +47,11 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, handleFace
   };
 
   const handleUpload = () => {
-    console.log(selectedImage);
+    setIsLoading(true);
     if (!selectedImage) {
+      toast.error("No image selected");
       console.error("No image selected");
+      setIsLoading(false);
       return;
     }
 
@@ -51,11 +60,17 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, handleFace
     axios
       .post("http://localhost:5001/api/process-image", formData)
       .then((response) => {
+        toast.success("Image uploaded");
         onImageUpload(response.data.result);
         handleFaceTypeChange(response.data.faceType);
+        toast.success("Face type detected");
       })
       .catch((error) => {
+        toast.error("Error uploading image");
         console.error("Error uploading image:", error);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -75,7 +90,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, handleFace
       <div className="flex flex-col sm:flex-row items-center justify-center w-full my-5 gap-3">
         <button
           className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ${
-            mode === "upload" && "bg-blue-700"
+            mode === "upload" && "bg-transparent border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"
           }`}
           onClick={() => setMode("upload")}
         >
@@ -83,7 +98,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, handleFace
         </button>
         <button
           className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ${
-            mode === "webcam" && "bg-blue-700"
+            mode === "webcam" && "bg-transparent border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"
           }`}
           onClick={() => setMode("webcam")}
         >
@@ -169,9 +184,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, handleFace
             </p>
             <hr className="w-full bg-gray-700" />
             <div>
-              <p className="text-xs text-gray-500">
-                Preview:
-              </p>
+              <p className="text-xs text-gray-500">Preview:</p>
               <Image
                 src={
                   selectedImage
@@ -189,10 +202,17 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, handleFace
         <hr className="w-full bg-gray-700 my-8" />
 
         <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded
+                disabled:opacity-50 disabled:cursor-not-allowed
+          "
           onClick={handleUpload}
+          disabled={isLoading}
         >
-          Find my hairstyle!
+          {isLoading ? (
+            <Dna width={100} height={50}/>
+          ) : (
+            <p>Find my hairstyle!</p>
+          )}
         </button>
       </div>
     </div>
